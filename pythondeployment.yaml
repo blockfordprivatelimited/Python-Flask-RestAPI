@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pythonapp
+spec:
+  revisionHistoryLimit: 10
+  replicas: 2
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: mavenwebapp
+  template:
+    metadata:
+      name: pythonpod
+      labels:
+        app: mavenwebapp
+    spec:
+      containers:
+        - name: mavenwebappcontainer
+          image: python:3.8
+          ports:
+            - containerPort: 5000
+          resources:
+            requests:
+              cpu: 200m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pythonsvc
+spec:
+  selector:
+    app: mavenwebapp
+  type: NodePort
+  ports:
+  - port: 80
+    targetPort: 5000
